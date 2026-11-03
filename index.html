@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
 	<title>Snow Rider 3D</title>
 
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bpog/snow-rider-3d@main/Template%20Data/style.css">
-
-	<script src="https://cdn.jsdelivr.net/gh/bpog/snow-rider-3d@main/Template%20Data/unityprogress.js"></script>
-
-	<!-- FIXED: proper JSDelivr link -->
-	<script src="https://cdn.jsdelivr.net/gh/bpog/snow-rider-3d@main/Build/UnityLoader.js"></script>
+	<link rel="stylesheet" href="./Template%20Data/style.css">
+	<script src="./Template%20Data/unityprogress.js"></script>
+	<script src="./Build/UnityLoader.js"></script>
 
 	<style>
 		html,
@@ -26,33 +21,54 @@
 			width: 100%;
 			height: 100%;
 		}
+
+		#loadError {
+			position: fixed;
+			inset: 0;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			padding: 24px;
+			box-sizing: border-box;
+			background: #111;
+			color: white;
+			font: 16px/1.5 sans-serif;
+			text-align: center;
+		}
 	</style>
-
 </head>
-
 <body>
-
 	<div class="webgl-content">
 		<div id="gameContainer"></div>
 	</div>
+	<div id="loadError" role="alert">The game could not be loaded. Please refresh the page, or check that the Build files are available.</div>
 
 	<script>
-		window.onload = function () {
-    var gameInstance = UnityLoader.instantiate(
-        "gameContainer",
-        "https://cdn.jsdelivr.net/gh/bpog/snow-rider-3d@main/Build/SnowRider3D-gd-1.json",
-        {
-            onProgress: UnityProgress,
-            Module: {
-                onRuntimeInitialized: function () {
-                    UnityProgress(gameInstance, "complete");
-                }
-            }
-        }
-    );
-};
+		window.addEventListener("load", function () {
+			if (!window.UnityLoader || typeof window.UnityLoader.instantiate !== "function") {
+				document.getElementById("loadError").style.display = "flex";
+				return;
+			}
+
+			var gameInstance;
+			try {
+				gameInstance = UnityLoader.instantiate(
+					"gameContainer",
+					"./Build/SnowRider3D-gd-1.json",
+					{
+						onProgress: UnityProgress,
+						Module: {
+							onRuntimeInitialized: function () {
+								UnityProgress(gameInstance, "complete");
+							}
+						}
+					}
+				);
+			} catch (error) {
+				console.error("Failed to start Snow Rider 3D:", error);
+				document.getElementById("loadError").style.display = "flex";
+			}
+		});
 	</script>
-
 </body>
-
 </html>
